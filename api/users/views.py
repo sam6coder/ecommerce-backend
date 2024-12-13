@@ -10,6 +10,11 @@ from django.contrib.auth import login,logout
 import random
 import re
 import json
+from django.utils.decorators import method_decorator
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import AllowAny
+
+
 
 def generate_session_token(length=10):   #number of characters in session token is 10
     char_list=[chr(i) for i in range(97,123)]   # a to z
@@ -102,6 +107,13 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes_by_action = {'create' : [AllowAny]}
     queryset = CustomUser.objects.all().order_by('id')
     serializer_class = UserSerializer
+    authentication_classes=[TokenAuthentication]
+    permission_classes=[AllowAny]
+    
+    @method_decorator(csrf_exempt)
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
 
     def get_permissions(self):
         try:
